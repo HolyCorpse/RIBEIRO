@@ -1,4 +1,3 @@
-from tkinter import N
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
@@ -7,7 +6,6 @@ import torch
 import modelo_light as nutils
 import utils_model as mutils
 import pytorch_lightning.callbacks as callback
-
 
 from pytorch_lightning.loggers import CSVLogger
 
@@ -40,10 +38,27 @@ train_dl = DataLoader(train, batch_size=batch_size)
 test_dl = DataLoader(test, batch_size=batch_size)
 val_dl = DataLoader(val, batch_size=batch_size)
 
+timestamp = datetime.now().isoformat()
+dirpath = f'saved_models/saved_model:{timestamp}'
+filename = f'resnet_saved_model'
 
-modelIC = nutils.LitModel(mutils.BasicBlock, channels=[64,128,192,256,320])
-trainer = pl.Trainer(fast_dev_run=True, max_epochs=100,
-                     accelerator='gpu')
+logger = CSVLogger("second_way", name=f'losses')
+
+checkpoint_callback = callback.ModelCheckpoint(
+    dirpath=dirpath, filename=filename, monitor='train_loss', save_top_k=2, mode='min')
+
+rich_callback = callback.RichModelSummary(max_depth=3)
+
+early_stopping_callback = callback.EarlyStopping(
+    monitor="val_loss", mode="min", patience=10)
+
+callback_list = [rich_callback, early_stopping_callback, checkpoint_callback]
+
+modelIC = nutils.LitModel(mutils.BasicBlock, channels=[64,128,192,256,320], rate_drop=0)
+# trainer = pl.Trainer(fast_dev_run=False, max_epochs=100,
+#                      accelerator='gpu')
+
+trainer = pl.Trainer(max_epochs=100, accelerator='gpu', callbacks=callback_list, logger=logger)
 
 trainer.fit(modelIC, train_dataloaders=train_dl, val_dataloaders=val_dl)
 
