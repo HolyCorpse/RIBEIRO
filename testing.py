@@ -17,8 +17,8 @@ data = np.load("data.npz")
 
 X_train = data[f"X_train"]
 X_test = data[f"X_test"]
-y_train = data[f"y_train"]
-y_test = data[f"y_test"]
+y_train = data[f"y_train"].astype(np.float32)
+y_test = data[f"y_test"].astype(np.float32)
 
 data_lenght = X_train.shape[2]
 data_channels = X_train.shape[1]
@@ -30,8 +30,8 @@ test = mutils.CustomDataset(X_test, y_test)
 train_dl = DataLoader(train, batch_size=batch_size)
 test_dl = DataLoader(test, batch_size=batch_size)
 
-dirpath = f'saved_models/saved_model:2023-01-05T17:26:00.921973'
-# dirpath = f'saved_models/saved_model:2022-12-23T13:17:10.357274'
+dirpath = f'saved_models/saved_model:2023-01-09T15:22:37.690770'
+# dirpath = f'saved_models/saved_model:2023-01-06T13:38:29.226212'
 filename = f'/resnet_saved_model.ckpt'
 
 # modelIC = mutils.ModeloAndrew(mutils.BasicBlock, option='A', initial_filters=64, num_blocks=[
@@ -40,8 +40,9 @@ filename = f'/resnet_saved_model.ckpt'
 model = nutils.LitModel.load_from_checkpoint(dirpath+filename)
 model.eval()
 sigmoid_de_cria = torch.nn.Sequential(torch.nn.Sigmoid())
-y_hat = sigmoid_de_cria(model(torch.tensor(X_test)))
-# y_hat = model(torch.tensor(X_test))
+# y_hat = sigmoid_de_cria(model(torch.tensor(X_test)))
+y_hat = model(torch.tensor(X_test))
+# y_hat = model(torch.tensor(X_train[0:3000, :, :]))
 y_hat = y_hat.detach().numpy()
 
 for i in range(y_hat.shape[0]):
@@ -55,9 +56,12 @@ diag_names = ['NORM', 'STTC', 'CD', 'MI', 'HYP']
 
 report_test = classification_report(
     y_true=y_test, y_pred=y_hat, output_dict=False, target_names=diag_names)
+# report_test = classification_report(
+#     y_true=y_train[0:3000,:], y_pred=y_hat, output_dict=False, target_names=diag_names)
 
 print(report_test)
 
 cm = utils.plot_confusion_matrix(y_test, y_hat, "resnet_de_cria", diag_names)
+# cm = utils.plot_confusion_matrix(y_train[0:3000,:], y_hat, "resnet_de_cria", diag_names)
 
 print()

@@ -9,21 +9,21 @@ class LitModel(pl.LightningModule):
         self.save_hyperparameters()
         self.model = mutils.RIBEIRO(
             block, channels, rate_drop)
-        self.metric = torch.nn.MultiLabelSoftMarginLoss(
-            weight=None, reduction='mean'
-        )
-        # self.metric = torch.nn.BCELoss()
+        # self.metric = torch.nn.MultiLabelSoftMarginLoss(
+        #     weight=None, reduction='mean'
+        # )
+        self.metric = torch.nn.BCELoss()
 
     def forward(self, x):
         return self.model.forward(x)
 
     # def configure_optimizers(self):
     #     optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
-    #     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+    #     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
     #     return [optimizer], [lr_scheduler]
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-5)
+        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
         return [optimizer]
 
     def training_step(self, batch, batch_idx):
