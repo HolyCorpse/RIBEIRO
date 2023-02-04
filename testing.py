@@ -30,7 +30,7 @@ test = mutils.CustomDataset(X_test, y_test)
 train_dl = DataLoader(train, batch_size=batch_size)
 test_dl = DataLoader(test, batch_size=batch_size)
 
-dirpath = f'saved_models/saved_model:2023-01-09T15:22:37.690770'
+dirpath = f'saved_models/saved_model:2023-02-02T11:29:24.430618'
 # dirpath = f'saved_models/saved_model:2023-01-06T13:38:29.226212'
 filename = f'/resnet_saved_model.ckpt'
 

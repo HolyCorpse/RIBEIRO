@@ -11,6 +11,14 @@ from pytorch_lightning.loggers import CSVLogger
 
 from datetime import datetime
 
+import sys
+
+sys.path.insert(
+    0, "/home/rleandro/git/RIBEIRO/pytorch-receptive-field/")
+
+from torch_receptive_field import receptive_field, receptive_field_for_unit
+
+
 torch.cuda.empty_cache()
 
 batch_size = 107
@@ -52,8 +60,8 @@ rich_callback = callback.RichModelSummary(max_depth=3)
 early_stopping_callback = callback.EarlyStopping(
     monitor="val_loss", mode="min", patience=10)
 
-# callback_list = [rich_callback, early_stopping_callback, checkpoint_callback]
-callback_list = [rich_callback, checkpoint_callback]
+callback_list = [rich_callback, early_stopping_callback, checkpoint_callback]
+# callback_list = [rich_callback, checkpoint_callback]
 
 modelIC = nutils.LitModel(mutils.BasicBlock, channels=[64,128,192,256,320], rate_drop=0.2)
 # trainer = pl.Trainer(fast_dev_run=False, max_epochs=100,
